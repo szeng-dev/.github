@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ $default-branch ]
 
+env:
+  NODE_VERSION: 12.x
+
 jobs:
   lint:
     name: Lint
@@ -13,23 +16,17 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v2
-      - name: Cache node_modules
-        uses: actions/cache@v2
-        id: node-modules
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
-      - name: Restore .npm cache
-        if: steps.node-modules.outputs.cache-hit != 'true'
+      - name: Cache node modules
         uses: actions/cache@v2
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}
-            ${{ runner.os }}-npm-cache-
+            ${{ runner.os }}-node-
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: env.NODE_VERSION
       - name: Install dependencies
         if: steps.node-modules.outputs.cache-hit != 'true'
         run: npm install --prefer-offline --no-audit
@@ -43,25 +40,19 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v2
-      - name: Cache node_modules
-        uses: actions/cache@v2
-        id: node-modules
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
-      - name: Restore .npm cache
-        if: steps.node-modules.outputs.cache-hit != 'true'
+      - name: Cache node modules
         uses: actions/cache@v2
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}
-            ${{ runner.os }}-npm-cache-
+            ${{ runner.os }}-node-
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: env.NODE_VERSION
       - name: Install dependencies
         if: steps.node-modules.outputs.cache-hit != 'true'
         run: npm install --prefer-offline --no-audit
-      - name: Run unite tests
+      - name: Run unit tests
         run: npm run ng -- test --watch=false --progress=false --sourceMap=false --browsers=ChromeHeadless
