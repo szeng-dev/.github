@@ -32,7 +32,7 @@ jobs:
             ${{ runner.os }}-npm-cache-
       - name: Install dependencies
         if: steps.node-modules.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
+        run: npm install --prefer-offline --no-audit
       - name: Lint Code
         run: npm run lint
 
@@ -61,6 +61,6 @@ jobs:
             ${{ runner.os }}-npm-cache-
       - name: Install dependencies
         if: steps.node-modules.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
+        run: npm install --prefer-offline --no-audit
       - name: Run unite tests
         run: npm run ng -- test --watch=false --progress=false --sourceMap=false --browsers=ChromeHeadless
